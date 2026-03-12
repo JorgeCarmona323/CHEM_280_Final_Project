@@ -1,0 +1,13 @@
+name,target,type,epitope_start,epitope_end,state,status,pdb,notes
+AT8,tau,antibody,202,205,monomer,clinical_diagnostic,,pS202/pT205 phospho-specific
+PHF1,tau,antibody,396,404,monomer,research,,C-terminal phospho epitope
+MC1,tau,antibody,7,322,oligomer,research,,Conformational; disease-specific
+HJ8.5,tau,antibody,25,30,monomer,research,6NWP,Crystal structure available PDB 6NWP
+DC8E8,tau,antibody,275,311,monomer,research,,Blocks Tau-Tau interaction at MTBR
+LMTM_TRx0237,tau,small_molecule,244,368,monomer,failed_phase3,,Aggregation inhibitor; Phase 3 failed 2016
+Semorinemab,tau,antibody,1,50,monomer,failed_phase2,,N-terminal; Phase 2 failed 2021
+Gosuranemab,tau,antibody,6,23,monomer,failed_phase2,,N-terminal aa 6-23; Phase 2 failed 2021
+Tilavonemab,tau,antibody,150,250,monomer,failed_phase2,,Mid-region; Phase 2 failed 2022
+Baker2025_Nature_binder1,IDP_general,de_novo_protein,,,monomer,published_positive_control,,Baker lab Nature 2025 — fill in after reading
+Baker2025_Science_binder1,IDP_general,de_novo_protein,,,monomer,published_positive_control,,Baker lab Science 2025 — fill in after reading
+Cetuximab,EGFR,antibody,350,420,structured,approved_drug,1YY9,Domain III binder; structured protein control

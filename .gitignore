@@ -1,0 +1,29 @@
+# Generated structures and large files
+data/structures/
+results/
+*.pdb
+*.cif
+*.npz
+*.pt
+*.ckpt
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_tmp
+
+# OS
+.DS_Store
+*.Zone.Identifier
+
+# Logs
+*.log
+logs/
+tmp/

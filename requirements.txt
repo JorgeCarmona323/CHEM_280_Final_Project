@@ -1,0 +1,41 @@
+# Core scientific computing
+numpy>=1.24
+scipy>=1.10
+pandas>=2.0
+biopython>=1.81
+
+# ML / embeddings
+torch>=2.0
+fair-esm>=2.0.0       # ESM2 (pip install fair-esm)
+transformers>=4.35
+
+# Dimensionality reduction + clustering
+umap-learn>=0.5.4
+hdbscan>=0.8.33
+scikit-learn>=1.3
+
+# MD simulation
+openmm>=8.0           # conda install -c conda-forge openmm
+
+# Visualization
+matplotlib>=3.7
+seaborn>=0.12
+plotly>=5.15
+
+# Structure parsing
+biotite>=0.38
+
+# Utilities
+tqdm>=4.65
+pyyaml>=6.0
+
+# --- External tools (install separately) ---
+# Starling:     pip install starling-protein (Baker lab IDP ensemble generator)
+# RFDiffusion:  https://github.com/RosettaCommons/RFdiffusion
+# BindCraft:    https://github.com/martinpacesa/BindCraft
+# Forge:        HuggingFace yk0/forge-e80
+# ProteinMPNN:  https://github.com/dauparas/ProteinMPNN
+# ESMFold:      via esm library (esm.pretrained.esmfold_v1())
+# FoldMason:    conda install -c conda-forge -c bioconda foldmason
+# FoldSeek:     conda install -c conda-forge -c bioconda foldseek
+# ColabFold:    pip install colabfold (or use https://colabfold.mmseqs.com/)
