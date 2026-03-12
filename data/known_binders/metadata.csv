@@ -1,13 +1,23 @@
-name,target,type,epitope_start,epitope_end,state,status,pdb,notes
-AT8,tau,antibody,202,205,monomer,clinical_diagnostic,,pS202/pT205 phospho-specific
-PHF1,tau,antibody,396,404,monomer,research,,C-terminal phospho epitope
-MC1,tau,antibody,7,322,oligomer,research,,Conformational; disease-specific
-HJ8.5,tau,antibody,25,30,monomer,research,6NWP,Crystal structure available PDB 6NWP
-DC8E8,tau,antibody,275,311,monomer,research,,Blocks Tau-Tau interaction at MTBR
-LMTM_TRx0237,tau,small_molecule,244,368,monomer,failed_phase3,,Aggregation inhibitor; Phase 3 failed 2016
-Semorinemab,tau,antibody,1,50,monomer,failed_phase2,,N-terminal; Phase 2 failed 2021
-Gosuranemab,tau,antibody,6,23,monomer,failed_phase2,,N-terminal aa 6-23; Phase 2 failed 2021
-Tilavonemab,tau,antibody,150,250,monomer,failed_phase2,,Mid-region; Phase 2 failed 2022
-Baker2025_Nature_binder1,IDP_general,de_novo_protein,,,monomer,published_positive_control,,Baker lab Nature 2025 — fill in after reading
-Baker2025_Science_binder1,IDP_general,de_novo_protein,,,monomer,published_positive_control,,Baker lab Science 2025 — fill in after reading
-Cetuximab,EGFR,antibody,350,420,structured,approved_drug,1YY9,Domain III binder; structured protein control
+name,target,type,epitope_start,epitope_end,state,status,pdb,kd_nM,notes
+AT8,tau,antibody,202,205,monomer,clinical_diagnostic,,,"pS202/pT205 phospho-specific"
+PHF1,tau,antibody,396,404,monomer,research,,,"C-terminal phospho epitope"
+MC1,tau,antibody,7,322,oligomer,research,,,"Conformational; disease-specific"
+HJ8.5,tau,antibody,25,30,monomer,research,6NWP,,"Crystal structure PDB 6NWP"
+DC8E8,tau,antibody,275,311,monomer,research,,,"Blocks Tau-Tau MTBR interaction"
+LMTM_TRx0237,tau,small_molecule,244,368,monomer,failed_phase3,,,"Aggregation inhibitor; Phase 3 failed 2016"
+Semorinemab,tau,antibody,1,50,monomer,failed_phase2,,,"N-terminal; Phase 2 failed 2021"
+Gosuranemab,tau,antibody,6,23,monomer,failed_phase2,,,"N-terminal aa 6-23; Phase 2 failed 2021"
+Tilavonemab,tau,antibody,150,250,monomer,failed_phase2,,,"Mid-region; Phase 2 failed 2022"
+Baker2025_Nature_amylin68,amylin,de_novo_protein,,,monomer,published_positive_control,,3.8,"Liu/Wu et al. Nature 2025 (10.1038/s41586-025-09248-9); amylin-68; flexible RFdiffusion; two-sided partial diffusion"
+Baker2025_Nature_amylin36,amylin,de_novo_protein,,,monomer,published_positive_control,,10,"Liu/Wu et al. Nature 2025; amylin-36; different conformation"
+Baker2025_Nature_amylin75,amylin,de_novo_protein,,,monomer,published_positive_control,,15,"Liu/Wu et al. Nature 2025; amylin-75"
+Baker2025_Nature_CP35,C_peptide,de_novo_protein,,,monomer,published_positive_control,,28,"Liu/Wu et al. Nature 2025; C-peptide (31 aa, insulin precursor); Kd=28 nM"
+Baker2025_Nature_G3BP1_11,G3BP1_RBD,de_novo_protein,,,IDR_in_structured,published_positive_control,,11,"Liu/Wu et al. Nature 2025; G3BP1 RNA-binding domain IDR; crystal structure; disrupts stress granules in cells; Kd=11 nM"
+Baker2025_Nature_FUS_best,FUS,de_novo_protein,239,267,monomer,published_positive_control,,520,"Liu/Wu et al. Nature 2025; FUS residues 239-267 (52% Gly/Ser/Asn/Gln); 3/94 designs showed binding"
+Baker2025_Nature_prion,prion_VNITIKQH,de_novo_protein,180,187,IDR_in_structured,published_positive_control,,14,"Liu/Wu et al. Nature 2025; prion protein core IDR aa 180-187 (VNITIKQH) beta-strand conformation; Kd=14 nM"
+Baker2025_Nature_BRCA1_ARATH,BRCA1_ARATH,de_novo_protein,182,202,monomer,published_positive_control,,52,"Liu/Wu et al. Nature 2025; BRCA1_ARATH 21-residue segment; 2/41 designs bound at ~450 nM; two-sided diffusion to 52 nM"
+Baker2025_Science_DYNA_r2,Dynorphin_A,de_novo_protein,,,monomer,published_positive_control,,0.08,"Wu/Jiang/Baker et al. Science 2025 (10.1126/science.adr8063); template library approach; <0.08 nM"
+Baker2025_Science_MSLN,Mesothelin_IDR,de_novo_protein,,,IDR_in_structured,published_positive_control,,1,"Wu/Jiang/Baker et al. Science 2025; Mesothelin disordered region; <1 nM"
+Baker2025_Science_EF1,EWS_FLI_fusion,de_novo_protein,,,monomer,published_positive_control,,500,"Wu/Jiang/Baker et al. Science 2025; EWS/FLI fusion protein (Ewing sarcoma); Kd >500 nM — harder target"
+Baker2025_Science_AT1,Angiotensin_I,de_novo_protein,,,monomer,published_positive_control,,75,"Wu/Jiang/Baker et al. Science 2025; AT1 Angiotensin I; Kd=75 nM"
+Cetuximab,EGFR,antibody,350,420,structured,approved_drug,1YY9,,"Domain III binder; structured protein positive control"

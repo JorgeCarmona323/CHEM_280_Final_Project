@@ -130,7 +130,62 @@ python src/structure_prep/run_md_relaxation.py \
 
 ---
 
-## 1.6 Output Structures (per construct)
+## 1.6 Construct Validation via FoldSeek Identity Check
+
+After MD relaxation, validate that the Frankenstein construct is still recognizable as the intended protein. This confirms the stitched IDP conformer is structurally plausible in context — not a phantom structure that drifted away from the real protein.
+
+**The question**: *Does FoldSeek retrieve the correct protein when searching the relaxed construct against PDB?*
+
+If yes → the IDP conformer is realistic and fits coherently with the stable domain.
+If no → the chosen IDP conformer is incompatible; try a different Starling ensemble member.
+
+```bash
+python src/structure_prep/validate_construct.py \
+    --construct data/structures/tau_relaxed/tau_monomer_relaxed.pdb \
+    --reference_name "Tau" \
+    --foldseek_db pdb \
+    --output results/validation/construct_validation/ \
+    --min_tm 0.5
+```
+
+**How it works**:
+1. FoldSeek searches the relaxed stitched structure against PDB
+2. Top hits are parsed and filtered by TM-score (≥ 0.5)
+3. Checks whether `reference_name` (e.g. "Tau", "MAPT") appears in top-K hits
+4. Writes a summary report: confirmed ✓ or failed ✗
+
+**Pass criterion**: TM-score ≥ 0.5 to a known Tau/MAPT structure in top-10 hits.
+
+**If a construct fails**:
+- Try a different Starling conformer (next in the `conformer_ranking.csv`)
+- Widen the junction window in `stitch_constructs.py` (--junction_window 8)
+- Check whether the IDP region FoldMason motif is genuinely compatible with the stable domain termini
+
+**Full loop** (Starling → FoldMason → stitch → MD → FoldSeek → iterate):
+```bash
+for RANK in 01 02 03 04 05; do
+    python src/structure_prep/stitch_constructs.py \
+        --stable data/structures/tau_af2/tau_full.pdb \
+        --idp_ensemble data/structures/tau_monomer_refined/rank${RANK}_*.pdb \
+        --idp_residues 244-368 \
+        --output data/structures/tau_stitched/
+
+    python src/structure_prep/run_md_relaxation.py \
+        --input data/structures/tau_stitched/stitched_rank${RANK}_*.pdb \
+        --output data/structures/tau_relaxed/tau_monomer_rank${RANK}_relaxed.pdb \
+        --idp_residues 244-368
+
+    python src/structure_prep/validate_construct.py \
+        --construct data/structures/tau_relaxed/tau_monomer_rank${RANK}_relaxed.pdb \
+        --reference_name "Tau" \
+        --output results/validation/construct_validation/ && break
+done
+# Stops at first conformer that passes validation
+```
+
+---
+
+## 1.7 Output Structures (per construct)
 
 | File | Description |
 |------|-------------|

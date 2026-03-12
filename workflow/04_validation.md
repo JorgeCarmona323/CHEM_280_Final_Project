@@ -33,25 +33,66 @@ Use a well-characterized protein-binder pair to confirm the full pipeline (Phase
 
 ## 4.2 IDP Binder Controls — Baker Lab 2025
 
-Two landmark papers establishing the feasibility of de novo IDP binder design:
+Two landmark papers establishing the feasibility of de novo IDP binder design.
 
-### Paper 1 (Nature 2025)
-> *de novo design of binders for intrinsically disordered proteins* — Baker lab
+---
 
-- Provides designed binders for specific IDP targets (sequences + structures available)
-- **Use as**: positive class in embedding cluster analysis — do our generated binders land in the same cluster?
-- **Metric**: fraction of Baker 2025 binders within HDBSCAN clusters identified in our pipeline
+### Paper A — Nature 2025
+> **"Diffusing protein binders to intrinsically disordered proteins"**
+> Liu, Wu, Choi, Han, Baker et al. *Nature* 644, 809–820 (2025). DOI: 10.1038/s41586-025-09248-9
 
-### Paper 2 (Science 2025)
-> *Target-specific IDP binder design* — Baker lab
+**Method**: Flexible target fine-tuned RFdiffusion starting from **sequence only**. Key innovation: **two-sided partial diffusion** — both target and binder conformations sampled simultaneously.
 
-- More specific to a particular IDP target (check paper for exact system)
-- **Use as**: structural recall target in FoldSeek search
-- **Metric**: TM-score of FoldSeek top hits vs. Baker 2025 structures
+**Key targets and Kd values**:
+| Target | Type | Kd (nM) | Notes |
+|--------|------|---------|-------|
+| Amylin (hIAPP) | IDP | 3.8–100 | Four binders; different conformations; crystal structures |
+| C-peptide (31 aa) | IDP | 28 | CP-35; thermostable 95°C |
+| VP48 | IDP | 39 | Transcription activator |
+| BRCA1_ARATH IDR | IDP | 52 | 21-residue disordered segment |
+| FUS (239–267) | IDP | 520 | Challenging; 52% Gly/Ser/Asn/Gln; 3/94 bound |
+| G3BP1 RBD (IDR) | IDR-in-structured | 11 | **Crystal structure**; disrupts stress granules in cells |
+| Prion (180–187) | IDR-in-structured | 14 | VNITIKQH β-strand |
+| IL-2RG (327–336) | IDR-in-structured | 97 | Cell surface receptor IDR |
+
+**FUS relevance**: FUS is directly analogous to Tau — both are disease-relevant RNA-binding IDPs with low-complexity disordered regions. The 520 nM result (3/94 binding) shows highly disordered low-complexity sequences remain challenging. Tau is similar — calibrate expectations accordingly.
+
+**Best positive control for our pipeline**: G3BP1-11 — crystal structure, cellular validation, high affinity.
+
+---
+
+### Paper B — Science 2025
+> **"Design of intrinsically disordered region binding proteins"**
+> Wu, Jiang, Hicks, Baker et al. *Science* 389, eadr8063 (2025). DOI: 10.1126/science.adr8063
+
+**Method**: Template library threading — 1000 repeat-protein templates covering diverse extended conformations → thread target IDR subsequences → refine top matches with RFdiffusion + ProteinMPNN.
+
+**Scale**: 39/43 targets yielded binders; 100 pM–100 nM; ~22 designs/target.
+
+**Selected targets**:
+| Target | Kd (nM) | Relevance |
+|--------|---------|-----------|
+| Dynorphin A-r2 | <0.08 | Best-in-class control |
+| Mesothelin IDR | <1 | IDR in structured protein |
+| Angiotensin I | 75 | Short IDP |
+| EWS/FLI fusion | >500 | Harder IDP target (similar difficulty to Tau) |
+| Telomerase IDR | 91 | Cellular IDP |
+
+**Template threading relevance**: Identify unique 8–40 aa subsequences in Tau constructs (PHF6, PHF6*, R1–R4 junctions) → thread through Baker template library → use matches as RFdiffusion seeds.
+
+---
+
+### Additional paper — BindCraft
+> **"One-shot design of functional protein binders with BindCraft"**
+> Pacesa, Nickel, Schellhaas, Correia et al. *Nature* 646, 483 (2025). DOI: 10.1038/s41586-025-09429-6
+
+AF2 multimer hallucination + MPNNsol + AF2 monomer filtering. 10–100% success rates. Targets: PD-1 (<1 nM), CD45 (15 nM), SpCas9 (267 nM). Used in our Track A for structured/IDR targets.
+
+---
 
 ### How to obtain structures
-- Check PDB depositions from each paper (typically deposited with publication)
-- Or use sequences from Supplementary Tables → fold with ESMFold → add to `data/known_binders/`
+- **G3BP1-11, amylin-22, amylin-18**: Crystal structures deposited — search PDB for DOI 10.1038/s41586-025-09248-9
+- **Science paper binders**: Sequences in Supplementary Tables → ESMFold → add to `data/known_binders/`
 
 ---
 

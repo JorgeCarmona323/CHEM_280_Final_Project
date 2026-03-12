@@ -51,10 +51,16 @@ data/constructs/tau/sequences.md
                 │       - SVD rotation+translation
                 │       - Atom coordinate transform for IDP region
                 │
-                └── run_md_relaxation.py      → data/structures/{construct}_relaxed.pdb
-                        - AMBER14-SB + TIP3P
-                        - Cα restraints on stable domain
-                        - Energy minimize → NVT → NPT
+                ├── run_md_relaxation.py      → data/structures/{construct}_relaxed.pdb
+                │       - AMBER14-SB + TIP3P
+                │       - Cα restraints on stable domain
+                │       - Energy minimize → NVT → NPT
+                │
+                └── validate_construct.py     → results/validation/construct_validation/
+                        - FoldSeek search relaxed construct vs PDB
+                        - Confirms TM-score ≥ 0.5 to reference protein
+                        - If fails: try next ranked conformer from FoldMason
+                        - Loop: Starling → FoldMason → stitch → MD → FoldSeek → ✓
 ```
 
 ### Key design decisions
@@ -264,6 +270,7 @@ results/                          ← gitignored
 |--------|--------|---------|
 | `foldmason_refine.py` | Starling ensemble dir | ranked/filtered conformer PDBs + ranking CSV |
 | `stitch_constructs.py` | stable PDB, IDP ensemble dir, residue range | stitched PDBs |
+| `validate_construct.py` | relaxed construct PDB, reference name | FoldSeek hits CSV + validation summary |
 | `run_md_relaxation.py` | stitched PDB, IDP residue range | relaxed PDB |
 | `motif_scanner.py` | FASTA of binder sequences | UMAP CSV, cluster CSV, raw embeddings NPZ |
 | `foldmason_parser.py` | FoldMason MSA FASTA | motifs CSV |
