@@ -66,17 +66,43 @@ python src/structure_prep/extract_starling_frames.py \
 - pLDDT < 70 per residue = disordered/unstructured in ESMFold
 - Cut at pLDDT < 70 boundaries to confirm IUPred2A
 
-**For Tau (2N4R, 441 aa)**:
-| Region | Residues | Disorder | Notes |
-|--------|----------|----------|-------|
-| N-terminal | 1–150 | Yes | Not aggregation-relevant |
-| Proline-rich | 151–243 | Partial | Some transient structure |
-| **MTBR (R1–R4)** | **244–368** | **Yes** | **→ run Starling here** |
-| C-terminal tail | 369–441 | Yes | Largely disordered |
+**For Tau (Big Tau, 758 aa isoform)**:
+| Region | Residues | IUPred | Notes |
+|--------|----------|--------|-------|
+| N-terminal projection | 1–560 | 0.70–0.95 | Mostly disordered, not aggregation-core |
+| Proline-rich region | 510–583 | 0.60–0.80 | Partial disorder |
+| **MTBR (R1–R4 core)** | **583–720** | **drops to 0.32** | **→ run Starling here** |
+| C-terminal tail | 720–758 | 0.75–0.90 | Disordered |
 
-**Recommended trim for Tau**: residues **244–368** (K18, ~125 aa) — contains PHF6* (275–280) and PHF6 (306–311).
+**Recommended trim for Tau (Big Tau numbering)**: residues **583–720** (~137 aa)
+- PHF6* (VQIINK) at ~591–596
+- PHF6 (VQIVYK) at ~623–628 (lowest IUPred: 0.32 at V635 — most structured sub-region)
+- For 2N4R (441 aa) use residues **244–368** (K18 fragment)
 
-**For your other target**: run IUPred2A on the full sequence once you have it from your collaborator.
+**For FMRP (Fragile X protein, 621 aa)**:
+| Region | Residues | IUPred | Notes |
+|--------|----------|--------|-------|
+| Tudor + KH1 | 1–270 | 0.02–0.40 | Highly structured |
+| KH2 domain | 270–380 | 0.10–0.50 | Structured |
+| Transition zone | 380–425 | 0.50–0.76 | Semi-disordered; avoid for Starling |
+| **IDR / RGG box** | **425–621** | **0.76–0.91** | **→ run Starling here** |
+
+**Recommended trim for FMRP**: residues **430–621** (~191 aa)
+- ANCHOR peaks at 460–475 and 610–621 = binding-competent sub-regions
+- Full RGG box captured; within 200 aa Starling default max_length
+
+Parse IUPred2A output programmatically:
+```bash
+python src/structure_prep/parse_iupred.py \
+    --input data/iupred/fmrp_iupred.txt \
+    --threshold 0.5 --padding 15 --max_length 200 \
+    --fasta_out data/constructs/target_protein/fmrp_idr_trimmed.fasta --plot
+
+python src/structure_prep/parse_iupred.py \
+    --input data/iupred/tau_iupred.txt \
+    --threshold 0.5 --padding 20 --max_length 200 \
+    --fasta_out data/constructs/tau/tau_mtbr_trimmed.fasta --plot
+```
 
 ### AlphaFold2 — stable domain prediction
 For the full-protein constructs, predict the structured regions with AF2 and use those as the anchor for stitching.

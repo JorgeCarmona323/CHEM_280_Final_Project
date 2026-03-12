@@ -34,8 +34,26 @@ SKVTSKCGSLGNIHHKPGGGQVEVKSEKLDFKDRVQSKIGSLDNITHVPGGGNKKIETHKLTFRENAKAKTDHGAEIVYK
 ```
 *(Protofilament core only; residues 274-380 approx)*
 
-## Target Protein A
-To be added once sequences are confirmed with collaborator.
+## Big Tau Isoform Note (758 aa)
+
+If working from the 758-aa Big Tau isoform (2N4R + exon 4A insert), use these residue numbers:
+- MTBR trim: **583–720** (~137 aa) — contains PHF6* at 591–596, PHF6 at 623–628
+- IUPred analysis: lowest score 0.32 at residue 635 (V in PHF6 region)
+
+```
+>tau_mtbr_bigtau_583_720
+```
+*(Residues 583–720 of Big Tau 758-aa isoform; verify against UniProt P10636-4 or equivalent)*
+
+---
+
+## Target Protein A — FMRP
+
+See `data/constructs/target_protein/sequences.md` for full FMRP documentation.
+
+**Quick reference**:
+- Construct A1: IDR only, residues **430–621** (~191 aa) → Starling input
+- Construct A2: Full protein (621 aa) → ColabFold → stable domain anchor for stitching
 
 ## Notes
 - All sequences should be verified against UniProt before generating structures
