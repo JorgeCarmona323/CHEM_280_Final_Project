@@ -14,8 +14,9 @@ umap-learn>=0.5.4
 hdbscan>=0.8.33
 scikit-learn>=1.3
 
-# MD simulation
+# MD simulation + trajectory analysis
 openmm>=8.0           # conda install -c conda-forge openmm
+MDAnalysis>=2.6       # pip install MDAnalysis  (required for Starling XTC extraction)
 
 # Visualization
 matplotlib>=3.7
@@ -30,12 +31,18 @@ tqdm>=4.65
 pyyaml>=6.0
 
 # --- External tools (install separately) ---
-# Starling:     pip install starling-protein (Baker lab IDP ensemble generator)
+# Starling:     https://github.com/idptools/starling.git
+#               pip install idptools-starling  (OR dev: pip install git+https://github.com/idptools/starling.git)
+#               Input: trimmed IDP sequence only (not full protein)
+#               Output: {name}_STARLING.pdb + {name}_STARLING.xtc → extract frames with extract_starling_frames.py
 # RFDiffusion:  https://github.com/RosettaCommons/RFdiffusion
 # BindCraft:    https://github.com/martinpacesa/BindCraft
 # Forge:        HuggingFace yk0/forge-e80
 # ProteinMPNN:  https://github.com/dauparas/ProteinMPNN
 # ESMFold:      via esm library (esm.pretrained.esmfold_v1())
-# FoldMason:    conda install -c conda-forge -c bioconda foldmason
+# FoldMason:    https://github.com/steineggerlab/foldmason.git
+#               Binary: wget https://mmseqs.com/foldmason/foldmason-linux-avx2.tar.gz
+#               OR conda install -c conda-forge -c bioconda foldmason
+#               Outputs: {prefix}_aa.fa, {prefix}_3di.fa, {prefix}.nw, {prefix}.html
 # FoldSeek:     conda install -c conda-forge -c bioconda foldseek
 # ColabFold:    pip install colabfold (or use https://colabfold.mmseqs.com/)

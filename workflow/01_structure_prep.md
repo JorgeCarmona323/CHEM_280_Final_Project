@@ -25,22 +25,58 @@ Produce one or more representative relaxed structures per construct that capture
 ## 1.2 Tools
 
 ### Starling — IDP ensemble generation
-Starling (Baker lab) generates structural ensembles for disordered proteins using a flow-based model trained on coarse-grained IDP simulations.
+Repo: https://github.com/idptools/starling.git
+
+**Important**: Starling is trained on pure IDPs — input only the disordered region, not the full protein. See §1.2a for trimming guidance.
 
 ```bash
-# Install (Python 3.10+, requires GPU)
-pip install starling-protein
+# Install
+conda create -n starling python=3.11 -y && conda activate starling
+pip install idptools-starling MDAnalysis
+# dev: pip install git+https://github.com/idptools/starling.git
 
-# Generate ensemble for Tau repeat domain
-python -c "
-from starling import Ensemble
-ens = Ensemble.from_fasta('data/constructs/tau/tau_monomer.fasta')
-ens.generate(n_structures=100, output_dir='data/structures/tau_monomer_ensemble/')
-"
+# Run on trimmed IDP sequence (-c = conformer count)
+starling KVQIINKKLDLSNVQSK... --outname tau_monomer -c 400 -r
+
+# Outputs:
+#   tau_monomer_STARLING.pdb   ← topology
+#   tau_monomer_STARLING.xtc   ← trajectory (400 conformers)
 ```
 
-**Output**: 100 PDB structures representing the disordered ensemble.
-**For our purpose**: cluster by RMSD and take 3–5 representative conformers per construct.
+**Extract individual PDB frames for FoldMason**:
+```bash
+python src/structure_prep/extract_starling_frames.py \
+    --topology tau_monomer_STARLING.pdb \
+    --trajectory tau_monomer_STARLING.xtc \
+    --output data/structures/tau_monomer_ensemble/ \
+    --n_frames 100
+```
+
+---
+
+### 1.2a Trimming the IDP Region
+
+**Why trim?** Starling performs poorly on mixed structured+disordered inputs. Run it only on the genuinely disordered segment.
+
+**Step 1 — IUPred2A** (most reliable): https://iupred2a.elte.hu/
+- Paste full protein sequence → look for residues with IUPred2 long score > 0.5
+- Find the longest contiguous disordered stretch — those are your trim boundaries
+
+**Step 2 — ESMFold pLDDT cross-check**
+- pLDDT < 70 per residue = disordered/unstructured in ESMFold
+- Cut at pLDDT < 70 boundaries to confirm IUPred2A
+
+**For Tau (2N4R, 441 aa)**:
+| Region | Residues | Disorder | Notes |
+|--------|----------|----------|-------|
+| N-terminal | 1–150 | Yes | Not aggregation-relevant |
+| Proline-rich | 151–243 | Partial | Some transient structure |
+| **MTBR (R1–R4)** | **244–368** | **Yes** | **→ run Starling here** |
+| C-terminal tail | 369–441 | Yes | Largely disordered |
+
+**Recommended trim for Tau**: residues **244–368** (K18, ~125 aa) — contains PHF6* (275–280) and PHF6 (306–311).
+
+**For your other target**: run IUPred2A on the full sequence once you have it from your collaborator.
 
 ### AlphaFold2 — stable domain prediction
 For the full-protein constructs, predict the structured regions with AF2 and use those as the anchor for stitching.

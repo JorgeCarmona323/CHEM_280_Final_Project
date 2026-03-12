@@ -13,23 +13,32 @@ FoldMason builds a structural MSA from a set of protein structures, identifying 
 All ESMFold-predicted binder structures (from Phase 2), organized by target construct.
 
 ```bash
-# Install FoldMason
-conda install -c conda-forge -c bioconda foldmason
+# Install FoldMason (pre-compiled binary — recommended)
+wget https://mmseqs.com/foldmason/foldmason-linux-avx2.tar.gz
+tar xvzf foldmason-linux-avx2.tar.gz && export PATH=$(pwd)/foldmason/bin/:$PATH
+# OR: conda install -c conda-forge -c bioconda foldmason
+# Repo: https://github.com/steineggerlab/foldmason.git
 
 # Build structural MSA for binders against tau_monomer
 foldmason easy-msa \
     results/esmfold/tau_monomer/*.pdb \
     results/foldmason/tau_monomer/msa \
-    tmp/ \
+    tmp/foldmason_tau_monomer/ \
     --report-mode 1
 
-# Compare across all constructs (look for cross-state motifs)
+# Outputs (prefix = results/foldmason/tau_monomer/msa):
+#   msa_aa.fa    ← amino acid MSA       ← use this for foldmason_parser.py
+#   msa_3di.fa   ← 3Di structural MSA
+#   msa.nw       ← Newick guide tree
+#   msa.html     ← interactive viewer with per-structure lDDT
+
+# Compare across all Tau constructs (cross-state motifs)
 foldmason easy-msa \
     results/esmfold/tau_monomer/*.pdb \
     results/esmfold/tau_oligomer/*.pdb \
     results/esmfold/tau_nft/*.pdb \
     results/foldmason/all_tau/msa \
-    tmp/
+    tmp/foldmason_all_tau/
 ```
 
 ### What we look for
@@ -39,8 +48,9 @@ foldmason easy-msa \
 
 ```bash
 # Parse FoldMason output and extract conserved motifs
+# Note: output file is msa_aa.fa (not msa.fasta)
 python src/motif_analysis/foldmason_parser.py \
-    --msa results/foldmason/all_tau/msa.fasta \
+    --msa results/foldmason/all_tau/msa_aa.fa \
     --pdb_dir results/esmfold/ \
     --output results/motifs/foldmason_motifs.csv \
     --conservation_threshold 0.7

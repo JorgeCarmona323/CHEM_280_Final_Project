@@ -55,7 +55,7 @@ def run_foldmason(
         *pdb_files,
         output_prefix,
         tmp_dir,
-        "--report-mode", "1",    # include per-structure lDDT
+        "--report-mode", "1",    # produces HTML with per-structure lDDT
         "--threads", "4",
     ]
 
@@ -63,40 +63,57 @@ def run_foldmason(
     if result.returncode != 0:
         raise RuntimeError(f"FoldMason failed:\n{result.stderr}")
 
-    msa_path = output_prefix + ".fasta"
-    lddt_path = output_prefix + "_lddt.tsv"
+    # Real FoldMason outputs: {prefix}_aa.fa, {prefix}_3di.fa, {prefix}.nw, {prefix}.html
+    msa_path = output_prefix + "_aa.fa"
+    html_path = output_prefix + ".html"   # contains per-structure lDDT (no separate TSV)
 
     if not os.path.exists(msa_path):
-        raise FileNotFoundError(f"FoldMason MSA output not found: {msa_path}")
+        raise FileNotFoundError(
+            f"FoldMason MSA output not found: {msa_path}\n"
+            f"Expected outputs: {output_prefix}_aa.fa, {output_prefix}_3di.fa, "
+            f"{output_prefix}.nw, {output_prefix}.html"
+        )
 
     print(f"FoldMason MSA written to {msa_path}")
-    return msa_path, lddt_path
+    if os.path.exists(html_path):
+        print(f"FoldMason HTML report (with lDDT): {html_path}")
+
+    return msa_path, html_path
 
 
-def parse_foldmason_lddt(lddt_path: str) -> dict[str, float]:
+def parse_foldmason_lddt(html_path: str) -> dict[str, float]:
     """
-    Parse FoldMason per-structure lDDT scores from TSV report.
+    Parse per-structure lDDT scores from FoldMason HTML report.
+
+    FoldMason does not produce a separate TSV — lDDT data is embedded in
+    the HTML report (--report-mode 1). This function extracts it via regex.
 
     Returns dict: {structure_name -> mean_lddt}
+    Falls back to empty dict (MSA-only scoring) if HTML is not parseable.
     """
+    import re
+
     scores = {}
-    if not os.path.exists(lddt_path):
-        print(f"  Warning: lDDT report not found at {lddt_path}, using MSA-based scoring")
+    if not os.path.exists(html_path):
+        print(f"  Warning: FoldMason HTML report not found at {html_path}, "
+              f"falling back to MSA-consistency-only scoring")
         return scores
 
-    with open(lddt_path) as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            parts = line.split("\t")
-            if len(parts) >= 2:
-                name = parts[0]
-                try:
-                    lddt = float(parts[1])
-                    scores[name] = lddt
-                except ValueError:
-                    continue
+    with open(html_path) as f:
+        content = f.read()
+
+    # FoldMason embeds lDDT as JSON data in the HTML — pattern may vary by version
+    # Try to extract: "name": "...", "lddt": 0.xx patterns
+    pattern = r'"name"\s*:\s*"([^"]+)"[^}]*?"lddt"\s*:\s*([\d.]+)'
+    for m in re.finditer(pattern, content):
+        name, lddt = m.group(1), float(m.group(2))
+        scores[name] = lddt
+
+    if scores:
+        print(f"  Parsed lDDT scores for {len(scores)} structures from HTML report")
+    else:
+        print(f"  Could not parse lDDT from HTML (format may differ by FoldMason version); "
+              f"using MSA-consistency-only scoring")
 
     return scores
 
