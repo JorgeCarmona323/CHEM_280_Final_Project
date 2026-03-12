@@ -38,6 +38,12 @@ data/constructs/tau/sequences.md
         │
         └── IDP + stable domain constructs:
                 │
+                ├── foldmason_refine.py       → data/structures/{construct}_refined/*.pdb
+                │       - FoldMason easy-msa on full ensemble
+                │       - Per-conformer consistency score (vs. MSA consensus)
+                │       - Combined rank: 0.6×consistency + 0.4×lDDT
+                │       - Keep top-N representative conformers
+                │
                 ├── [AlphaFold2 — external]  → data/structures/{construct}_af2.pdb
                 │
                 ├── stitch_constructs.py      → data/structures/{construct}_stitched/*.pdb
@@ -256,6 +262,7 @@ results/                          ← gitignored
 
 | Module | Inputs | Outputs |
 |--------|--------|---------|
+| `foldmason_refine.py` | Starling ensemble dir | ranked/filtered conformer PDBs + ranking CSV |
 | `stitch_constructs.py` | stable PDB, IDP ensemble dir, residue range | stitched PDBs |
 | `run_md_relaxation.py` | stitched PDB, IDP residue range | relaxed PDB |
 | `motif_scanner.py` | FASTA of binder sequences | UMAP CSV, cluster CSV, raw embeddings NPZ |

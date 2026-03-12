@@ -54,7 +54,41 @@ colabfold_batch data/constructs/tau/tau_full.fasta data/structures/tau_af2/ --nu
 
 ---
 
-## 1.3 Stitching IDP regions to stable domains
+## 1.3 FoldMason Ensemble Refinement
+
+Before stitching, filter the Starling ensemble to keep only the most structurally consistent conformers. This removes outliers (misfolded or unrealistic structures) and ensures the representative conformers used downstream reflect the true ensemble average.
+
+```bash
+python src/structure_prep/foldmason_refine.py \
+    --ensemble data/structures/tau_monomer_ensemble/ \
+    --output data/structures/tau_monomer_refined/ \
+    --top_n 5 \
+    --tmp_dir tmp/foldmason_tau_monomer/ \
+    --report results/structure_prep/tau_monomer_conformer_ranking.csv
+```
+
+**How it works**:
+1. Runs `foldmason easy-msa` on all ensemble PDBs
+2. Parses the structural MSA to compute a **consensus** character per alignment column
+3. Scores each conformer by how closely it matches the column-wise consensus (**consistency score**)
+4. Combines with FoldMason per-structure **lDDT** (structural quality) into a single rank
+5. Copies the top-N ranked conformers to the refined output directory
+
+**Scoring**:
+```
+combined_score = 0.6 × consistency + 0.4 × lDDT_normalized
+```
+
+Adjust weights with `--consistency_weight` / `--lddt_weight` as needed.
+
+**Why this matters for IDPs**:
+Starling ensembles can include low-probability, physically implausible conformers. FoldMason refinement ensures the stitching and binder design steps operate on a clean, representative subset rather than outliers that would produce poor binders.
+
+**Output**: `conformer_ranking.csv` lists every conformer with its rank, consistency score, and lDDT — useful for understanding ensemble diversity.
+
+---
+
+## 1.4 Stitching IDP regions to stable domains
 
 For constructs where the IDP region is flanked by structured elements (e.g., Tau proline-rich region + microtubule-binding repeat + C-terminal tail):
 
@@ -75,7 +109,7 @@ python src/structure_prep/stitch_constructs.py \
 
 ---
 
-## 1.4 MD Relaxation (OpenMM)
+## 1.5 MD Relaxation (OpenMM)
 
 After stitching, the junction region may have clashes or non-physical geometry. Run a short MD relaxation.
 
@@ -96,7 +130,7 @@ python src/structure_prep/run_md_relaxation.py \
 
 ---
 
-## 1.5 Output Structures (per construct)
+## 1.6 Output Structures (per construct)
 
 | File | Description |
 |------|-------------|
