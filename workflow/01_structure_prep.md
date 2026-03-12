@@ -54,55 +54,55 @@ python src/structure_prep/extract_starling_frames.py \
 
 ---
 
-### 1.2a Trimming the IDP Region
+### 1.2a Defining the IDP Construct Boundaries
 
-**Why trim?** Starling performs poorly on mixed structured+disordered inputs. Run it only on the genuinely disordered segment.
+**Why trim?** Starling performs poorly on mixed structured+disordered inputs. Input only the genuinely disordered/IDP segment.
 
-**Step 1 — IUPred2A** (most reliable): https://iupred2a.elte.hu/
-- Paste full protein sequence → look for residues with IUPred2 long score > 0.5
-- Find the longest contiguous disordered stretch — those are your trim boundaries
+#### Step 1 — Conserved Domain Mapping (primary method)
 
-**Step 2 — ESMFold pLDDT cross-check**
-- pLDDT < 70 per residue = disordered/unstructured in ESMFold
-- Cut at pLDDT < 70 boundaries to confirm IUPred2A
+Use **InterPro** or **NCBI** to identify annotated structured domains. The IDP region is what falls *outside* those domains.
 
-**For Tau (Big Tau, 758 aa isoform)**:
-| Region | Residues | IUPred | Notes |
-|--------|----------|--------|-------|
-| N-terminal projection | 1–560 | 0.70–0.95 | Mostly disordered, not aggregation-core |
-| Proline-rich region | 510–583 | 0.60–0.80 | Partial disorder |
-| **MTBR (R1–R4 core)** | **583–720** | **drops to 0.32** | **→ run Starling here** |
-| C-terminal tail | 720–758 | 0.75–0.90 | Disordered |
+**InterPro** (https://www.ebi.ac.uk/interpro/):
+- Search by UniProt accession or paste sequence
+- Examine the domain architecture diagram → note start/end residues of each annotated domain
+- The IDP region is the gap between (or flanking) annotated domains
 
-**Recommended trim for Tau (Big Tau numbering)**: residues **583–720** (~137 aa)
-- PHF6* (VQIINK) at ~591–596
-- PHF6 (VQIVYK) at ~623–628 (lowest IUPred: 0.32 at V635 — most structured sub-region)
-- For 2N4R (441 aa) use residues **244–368** (K18 fragment)
+**NCBI Conserved Domain Search** (https://www.ncbi.nlm.nih.gov/Structure/cdd/wrpsb.cgi):
+- Paste sequence → run CDD search
+- Download domain boundary table → use as trim coordinates
 
-**For FMRP (Fragile X protein, 621 aa)**:
-| Region | Residues | IUPred | Notes |
-|--------|----------|--------|-------|
-| Tudor + KH1 | 1–270 | 0.02–0.40 | Highly structured |
-| KH2 domain | 270–380 | 0.10–0.50 | Structured |
-| Transition zone | 380–425 | 0.50–0.76 | Semi-disordered; avoid for Starling |
-| **IDR / RGG box** | **425–621** | **0.76–0.91** | **→ run Starling here** |
+The IDP input to Starling should be the region **not** covered by any annotated domain, with the boundary set at the last annotated domain's end (± a few residues of confirmed disordered linker).
 
-**Recommended trim for FMRP**: residues **430–621** (~191 aa)
-- ANCHOR peaks at 460–475 and 610–621 = binding-competent sub-regions
-- Full RGG box captured; within 200 aa Starling default max_length
+#### Step 2 — Literature + Structure Validation
 
-Parse IUPred2A output programmatically:
-```bash
-python src/structure_prep/parse_iupred.py \
-    --input data/iupred/fmrp_iupred.txt \
-    --threshold 0.5 --padding 15 --max_length 200 \
-    --fasta_out data/constructs/target_protein/fmrp_idr_trimmed.fasta --plot
+Before finalizing trim coordinates:
+1. **Check published structures**: does the region of interest appear resolved in any PDB entry? Resolved = structured; missing electron density / not modeled = disordered.
+2. **Check literature**: is there a known functional name for the region (e.g., "RGG box", "MTBR", "prion-like domain")? Published trim coordinates from aggregation or binding studies are gold standard.
+3. **Visual inspection**: load AF2 model in PyMOL/ChimeraX — low-pLDDT regions (colored red/orange by default) mark the disordered segment visually.
 
-python src/structure_prep/parse_iupred.py \
-    --input data/iupred/tau_iupred.txt \
-    --threshold 0.5 --padding 20 --max_length 200 \
-    --fasta_out data/constructs/tau/tau_mtbr_trimmed.fasta --plot
-```
+#### Step 3 — Cross-check with pLDDT (secondary)
+
+From the AF2 structure:
+- pLDDT < 70 per residue = disordered/unstructured
+- Set final trim boundaries where pLDDT crosses 70 (structured → disordered transition)
+
+IUPred2A can provide additional confirmation but is **not** the primary boundary-setting tool.
+
+---
+
+**For Tau**:
+
+Determined by InterPro domain architecture + MTBR literature:
+| Domain | Residues (2N4R) | Notes |
+|--------|-----------------|-------|
+| N-terminal projection | 1–150 | No annotated domain; disordered |
+| Proline-rich | 151–243 | Partial; not aggregation-core |
+| **MTBR R1–R4** | **244–368** | IPR000184; aggregation-competent → Starling |
+| C-terminal | 369–441 | Disordered |
+
+Validated by: cryo-EM structures (PDB 6QJH, 5O3L), PHF6/PHF6* aggregation literature.
+
+**For Target Protein A** (to be determined): run InterPro on full sequence once available → document domain boundaries in `data/constructs/target_protein/sequences.md`.
 
 ### AlphaFold2 — stable domain prediction
 For the full-protein constructs, predict the structured regions with AF2 and use those as the anchor for stitching.

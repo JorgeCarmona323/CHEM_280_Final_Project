@@ -1,5 +1,10 @@
 # IUPred2A Data Files
 
+> **Note**: IUPred2A is a *secondary confirmation* tool in this project.
+> IDP construct boundaries are determined first by **InterPro / NCBI CDD domain architecture**
+> and validated against literature and structure data (PDB, AF2 pLDDT).
+> IUPred2A output stored here is for cross-reference only.
+
 Store raw IUPred2A output files here. These are the plain-text downloads from https://iupred2a.elte.hu/
 
 ## Files expected
