@@ -109,9 +109,40 @@ python src/structure_prep/stitch_constructs.py \
 
 ---
 
-## 1.5 MD Relaxation (OpenMM)
+## 1.5 FoldMason Pre-MD Quality Gate
 
-After stitching, the junction region may have clashes or non-physical geometry. Run a short MD relaxation.
+Before committing to MD (which is expensive), run FoldMason on the stitched construct(s) to confirm the IDP motifs survived stitching and the overall structure is coherent.
+
+**The question**: *Are the structurally conserved motifs identified in step 1.3 still present and well-formed after stitching?*
+
+If the FoldMason score drops sharply relative to the ensemble → the stitching disrupted the IDP motif → try the next-ranked conformer before spending GPU time on MD.
+
+```bash
+# Run FoldMason on all stitched conformers together
+python src/structure_prep/foldmason_refine.py \
+    --ensemble data/structures/tau_stitched/ \
+    --output data/structures/tau_stitched_refined/ \
+    --top_n 3 \
+    --tmp_dir tmp/foldmason_tau_stitched/ \
+    --report results/structure_prep/tau_stitched_conformer_ranking.csv
+```
+
+**What to check in `conformer_ranking.csv`**:
+- Consistency scores should be close to the ensemble scores from step 1.3
+- A large drop (>0.2) in consistency score means the IDP motif is distorted at the junction
+- Only pass top-scoring stitched conformers to MD
+
+**Second FoldMason vs first FoldMason** — purpose differs:
+| Step | Input | Purpose |
+|------|-------|---------|
+| 1.3 (first) | Raw Starling ensemble | Pick representative IDP conformers |
+| 1.5 (second) | Stitched constructs | Verify motifs survived stitching |
+
+---
+
+## 1.6 MD Relaxation (OpenMM)
+
+After the pre-MD FoldMason quality gate passes, run MD on the top-ranked stitched conformers.
 
 ```bash
 python src/structure_prep/run_md_relaxation.py \
@@ -130,7 +161,7 @@ python src/structure_prep/run_md_relaxation.py \
 
 ---
 
-## 1.6 Construct Validation via FoldSeek Identity Check
+## 1.7 Construct Validation via FoldSeek Identity Check
 
 After MD relaxation, validate that the Frankenstein construct is still recognizable as the intended protein. This confirms the stitched IDP conformer is structurally plausible in context — not a phantom structure that drifted away from the real protein.
 
@@ -185,7 +216,7 @@ done
 
 ---
 
-## 1.7 Output Structures (per construct)
+## 1.8 Output Structures (per construct)
 
 | File | Description |
 |------|-------------|

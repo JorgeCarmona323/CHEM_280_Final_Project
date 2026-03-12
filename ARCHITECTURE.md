@@ -38,11 +38,10 @@ data/constructs/tau/sequences.md
         │
         └── IDP + stable domain constructs:
                 │
-                ├── foldmason_refine.py       → data/structures/{construct}_refined/*.pdb
-                │       - FoldMason easy-msa on full ensemble
-                │       - Per-conformer consistency score (vs. MSA consensus)
-                │       - Combined rank: 0.6×consistency + 0.4×lDDT
-                │       - Keep top-N representative conformers
+                ├── [1] foldmason_refine.py   → data/structures/{construct}_refined/*.pdb
+                │       - FoldMason on raw Starling ensemble
+                │       - Scores by MSA consistency + lDDT
+                │       - Keeps top-N representative conformers
                 │
                 ├── [AlphaFold2 — external]  → data/structures/{construct}_af2.pdb
                 │
@@ -51,16 +50,20 @@ data/constructs/tau/sequences.md
                 │       - SVD rotation+translation
                 │       - Atom coordinate transform for IDP region
                 │
+                ├── [2] foldmason_refine.py   → data/structures/{construct}_stitched_refined/
+                │       - FoldMason on stitched constructs (pre-MD quality gate)
+                │       - Verifies IDP motifs survived stitching
+                │       - Drop if consistency score drops > 0.2 vs step [1]
+                │
                 ├── run_md_relaxation.py      → data/structures/{construct}_relaxed.pdb
                 │       - AMBER14-SB + TIP3P
                 │       - Cα restraints on stable domain
                 │       - Energy minimize → NVT → NPT
                 │
                 └── validate_construct.py     → results/validation/construct_validation/
-                        - FoldSeek search relaxed construct vs PDB
-                        - Confirms TM-score ≥ 0.5 to reference protein
-                        - If fails: try next ranked conformer from FoldMason
-                        - Loop: Starling → FoldMason → stitch → MD → FoldSeek → ✓
+                        - FoldSeek vs PDB; TM-score ≥ 0.5 to reference protein
+                        - If fails: loop back to next conformer from step [1]
+                        - Full loop: Starling→FM[1]→stitch→FM[2]→MD→FoldSeek→✓
 ```
 
 ### Key design decisions
