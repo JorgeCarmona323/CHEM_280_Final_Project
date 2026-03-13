@@ -22,6 +22,7 @@ venv/
 # OS
 .DS_Store
 *.Zone.Identifier
+*:Zone.Identifier
 
 # Literature PDFs (large files — store locally, don't commit)
 literature/*.pdf
