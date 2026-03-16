@@ -244,6 +244,10 @@ def main():
 
     # ── 4. AFRC deviation plots ───────────────────────────────────────────────
     positions = np.array([ca_arrays[i] for i in keep_idx])
+if len(positions) == 0:
+    print("WARNING: 0 frames passed Rg filter — check ensemble quality. Using all frames.")
+    positions = np.array(ca_arrays)
+    keep_idx = np.arange(len(ca_arrays))
     obs_dist  = np.zeros((n_residues, n_residues))
     for k in range(len(positions)):
         diff       = positions[k][:, None, :] - positions[k][None, :, :]
