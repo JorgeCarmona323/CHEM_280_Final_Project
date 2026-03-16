@@ -12,7 +12,7 @@ Can we systematically discover binders for IDP regions — including conformatio
 
 ## Target System
 
-### Protein A — [Collaborator's Target]
+### Protein A — [Fragile X Related Protein 1 (human)]
 | Construct | Description |
 |-----------|-------------|
 | A1 | IDP/disordered construct only |
