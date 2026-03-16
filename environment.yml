@@ -1,0 +1,52 @@
+name: chem280
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+
+dependencies:
+  # Python
+  - python=3.11
+
+  # Build tools (required for metapredict / idptools-starling compilation)
+  - gcc
+  - gxx
+
+  # Core scientific computing
+  - numpy>=1.24,<2.0
+  - scipy>=1.10
+  - pandas>=2.0
+  - matplotlib>=3.7
+  - seaborn>=0.12
+
+  # ML / embeddings
+  - pytorch>=2.0          # conda-forge build includes CPU; Colab brings CUDA
+  - transformers>=4.35
+
+  # Dimensionality reduction + clustering
+  - umap-learn>=0.5.4
+  - hdbscan>=0.8.33
+  - scikit-learn>=1.3
+
+  # Structure parsing
+  - biopython>=1.81
+  - biotite>=0.38
+
+  # Utilities
+  - tqdm>=4.65
+  - pyyaml>=6.0
+  - jupyter
+  - nbconvert
+
+  # External tools distributed via bioconda
+  - foldmason         # FoldMason structural MSA
+  # - foldseek        # uncomment for NB03 (Phase 3)
+
+  # pip-only packages
+  - pip
+  - pip:
+    - idptools-starling>=2.0.0a3   # Starling IDP conformer generation
+    - MDAnalysis>=2.6              # trajectory analysis (XTC extraction)
+    - afrc>=0.3.7                  # Analytical Flory Random Coil
+    - fair-esm>=2.0.0              # ESMFold / ESM2 (NB02c, NB03)
+    - plotly>=5.15                 # interactive plots (NB03)
